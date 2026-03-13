@@ -40,7 +40,7 @@ export function positionPreview(xpos: number, ypos: number, ybot: number): void 
     }
 }
 
-export function showPreview(preview: string, xpos: number, ypos: number, ybot: number): number {
+export function showPreview(content: string, xpos: number, ypos: number, ybot: number): number {
     if (!(ypos > 100 || ypos < 100 || ypos === 100)) {
         return -1;
     }
@@ -87,8 +87,8 @@ export function queryPreviewProviders(editor: any, pos: { line: number; ch: numb
     while (match) {
         if (match && match.index !== undefined && pos.ch >= match.index && pos.ch <= match.index + match[0].length) {
             var preview: string = "<div class='color-swatch-bg'><div class='color-swatch' style='background:" + prefix + (colorValue || match[0]) + ";'></div></div>";
-            var startPos: { line: number, ch: number } = { line: pos.line, ch: match.index }, endPos: { line: number, ch: number } = { line: pos.line, ch: match.index + match[0].length }, startCoords = charCoords(cm, startPos), xPos;
-            return showPreview(preview, startCoords[0], startCoords[1], startCoords[2]);
+            var startPos = { line: pos.line, ch: match.index }, endPos = { line: pos.line, ch: match.index + match[0].length }, startCoords = charCoords(cm, startPos), xPos;
+            return showPreview(preview, xPos, startCoords, startCoords);
         }
         match = colorRegEx.exec(line);
     }
