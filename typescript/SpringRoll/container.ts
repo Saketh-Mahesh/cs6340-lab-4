@@ -4,10 +4,10 @@
  */
 
 class PageVisibility {
-	foo;
-	bar;
+	foo: any;
+	bar: any;
 
-	constructor(_foo, _bar){
+	constructor(_foo: any, _bar: any) {
 		this.foo = _foo;
 		this.bar = _bar;
 	}
@@ -19,10 +19,10 @@ class PageVisibility {
 }
 
 class Plugin {
-	setup(){}
-	opened(){}
-	close(){}
-	teardown(){}
+	setup() { }
+	opened() { }
+	close() { }
+	teardown() { }
 }
 
 class Global {
@@ -48,15 +48,14 @@ class Global {
 export var plugin = new Plugin();
 export var global = new Global();
 
-export function extend(optionsObj,old){
+export function extend(optionsObj: any, old: any) {
 	return {
 		old: old,
 		pauseFocusSelector: optionsObj.pauseFocusSelector
 	}
 }
 
-plugin.setup = function()
-{
+plugin.setup = function (): void {
 	// Add the default option for pauseFocusSelector
 	global.options = extend(
 		{
@@ -114,8 +113,7 @@ plugin.setup = function()
 	 * Focus on the iframe's contentWindow
 	 * @method focus
 	 */
-	global.focus = function()
-	{
+	global.focus = function () {
 		global._containerBlurred = false;
 		global._keepFocus = true;
 	};
@@ -124,8 +122,7 @@ plugin.setup = function()
 	 * Unfocus on the iframe's contentWindow
 	 * @method blur
 	 */
-	global.blur = function()
-	{
+	global.blur = function () {
 		global._containerBlurred = true;
 	};
 
@@ -134,18 +131,15 @@ plugin.setup = function()
 	 * @method manageFocus
 	 * @protected
 	 */
-	global.manageFocus = function()
-	{
+	global.manageFocus = function () {
 		// Unfocus on the iframe
-		if (this._keepFocus)
-		{
+		if (this._keepFocus) {
 			global.blur();
 		}
 
 		// we only need one delayed call, at the end of any
 		// sequence of rapidly-fired blur/focus events
-		if (this._focusTimer)
-		{
+		if (this._focusTimer) {
 			clearTimeout(this._focusTimer);
 		}
 
@@ -154,8 +148,7 @@ plugin.setup = function()
 		// causing rapid toggling of the pause state and related issues,
 		// especially in Internet Explorer
 		this._focusTimer = setTimeout(
-			function()
-			{
+			function (this: any) {
 				this._focusTimer = null;
 				// A manual pause cannot be overriden by focus events.
 				// User must click the resume button.
@@ -165,8 +158,7 @@ plugin.setup = function()
 
 				// Focus on the content window when blurring the app
 				// but selecting the container
-				if (global._keepFocus && !global._containerBlurred && global._appBlurred)
-				{
+				if (global._keepFocus && !global._containerBlurred && global._appBlurred) {
 					global.focus();
 				}
 
@@ -188,25 +180,21 @@ plugin.setup = function()
  * @param  {Event} e Click or focus event
  * @return void - returns nothing
  */
-export var onDocClick = function(e)
-{
+export var onDocClick = function (e: any): void {
 	if (!global.loaded) return;
 
 	var target;
 
 	// Firefox support
-	if (e.originalEvent)
-	{
+	if (e.originalEvent) {
 		target = e.originalEvent;
 	}
-	else
-	{
+	else {
 		target = e.target;
 	}
-	if (!target.filter(elem => elem === global._containerBlurred).length)
-	{
+	if (!target.filter((elem: any) => elem === global._containerBlurred).length) {
 		global.focus();
-		return false;
+		return;
 	}
 };
 
@@ -215,8 +203,7 @@ export var onDocClick = function(e)
  * @method onKeepFocus
  * @private
  */
-export var onKeepFocus = function(event)
-{
+export var onKeepFocus = function (event: any): void {
 	global._keepFocus = !!event.data;
 	global.manageFocus();
 };
@@ -226,8 +213,7 @@ export var onKeepFocus = function(event)
  * @method onFocus
  * @private
  */
-export var onFocus = function(e)
-{
+export var onFocus = function (e: any): void {
 	global._appBlurred = !e.data;
 	global.manageFocus();
 };
@@ -237,8 +223,7 @@ export var onFocus = function(e)
  * @method onContainerFocus
  * @private
  */
-export var onContainerFocus = function(e)
-{
+export var onContainerFocus = function (): void {
 	global._containerBlurred = false;
 	global.manageFocus();
 };
@@ -248,8 +233,7 @@ export var onContainerFocus = function(e)
  * @method onContainerBlur
  * @private
  */
-export var onContainerBlur = function(e)
-{
+export var onContainerBlur = function (): void {
 	//Set both container and application to blurred,
 	//because some blur events are only happening on the container.
 	//If container is blurred because application area was just focused,
@@ -260,25 +244,20 @@ export var onContainerBlur = function(e)
 
 
 
-plugin.opened = function()
-{
+plugin.opened = function (): void {
 	global.focus();
 };
 
-plugin.close = function()
-{
+plugin.close = function (): void {
 	// Stop the focus timer if it's running
-	if (global._focusTimer)
-	{
+	if (global._focusTimer) {
 		clearTimeout(global._focusTimer);
 	}
 };
 
-plugin.teardown = function()
-{
+plugin.teardown = function (): void {
 	delete global._onDocClick;
-	if (global._pageVisibility)
-	{
+	if (global._pageVisibility) {
 		global._pageVisibility.destroy();
 		delete global._pageVisibility;
 	}
